@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inscripción · Torneo Interno Fo Lung Men 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --rojo:#b3121b; --rojo2:#8c0d14; --oro:#d4a017; --tinta:#1f1f1f; --gris:#6b6b6b; --borde:#e2dcd5; --fondo:#f6f2ee; --ok:#1e7a3b; --err:#b3121b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--fondo); color:var(--tinta); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:640px; margin:0 auto; padding:16px; }
+  header img { width:100%; border-radius:12px; display:block; }
+  h1 { font-size:1.5rem; margin:16px 0 4px; color:var(--rojo2); }
+  .sub { color:var(--gris); margin:0 0 12px; }
+  .card { background:#fff; border:1px solid var(--borde); border-radius:12px; padding:16px; margin:12px 0; }
+  .card h2 { font-size:1.1rem; margin:0 0 12px; border-left:4px solid var(--rojo); padding-left:8px; }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  label .opt { font-weight:400; color:var(--gris); }
+  input[type=text], input[type=email], input[type=tel], input[type=date], input[type=number], select, textarea {
+    width:100%; padding:12px; font-size:16px; border:1px solid var(--borde); border-radius:8px; background:#fff; color:var(--tinta); }
+  input:focus, select:focus, textarea:focus { outline:2px solid var(--oro); border-color:var(--oro); }
+  .check { display:flex; gap:10px; align-items:flex-start; padding:10px; border:1px solid var(--borde); border-radius:8px; margin:6px 0; font-weight:400; cursor:pointer; }
+  .check input { width:20px; height:20px; margin-top:2px; flex:none; }
+  .radios { display:flex; gap:8px; flex-wrap:wrap; }
+  .radios .check { flex:1 1 120px; }
+  .hint { color:var(--gris); font-size:.9rem; margin:4px 0 0; }
+  .total { display:flex; justify-content:space-between; align-items:center; background:#fff7e0; border:1px solid var(--oro); border-radius:8px; padding:12px; font-weight:700; font-size:1.1rem; margin-top:12px; }
+  .banco { white-space:pre-line; background:#faf8f6; border:1px dashed var(--borde); border-radius:8px; padding:12px; font-family:ui-monospace,Consolas,monospace; font-size:.95rem; }
+  .oculto { display:none !important; }
+  .trampa { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  button { width:100%; padding:14px; font-size:1.05rem; font-weight:700; color:#fff; background:var(--rojo); border:0; border-radius:10px; cursor:pointer; margin-top:8px; }
+  button:disabled { background:#999; cursor:wait; }
+  .errores { background:#fdeceb; border:1px solid var(--err); color:var(--err); border-radius:8px; padding:12px; margin:12px 0; }
+  .errores ul { margin:4px 0 0 18px; padding:0; }
+  .exito { text-align:center; }
+  .exito .num { font-size:2rem; font-weight:800; color:var(--ok); margin:8px 0; }
+  .aviso { background:#eef4ff; border:1px solid #c9d8f5; border-radius:8px; padding:10px; font-size:.95rem; }
+  .cargando { text-align:center; color:var(--gris); padding:48px 0; }
+  .vacio { color:var(--gris); font-style:italic; }
+  .wa { display:block; text-align:center; padding:14px; margin:12px 0; border-radius:10px; background:#1fa855; color:#fff; font-weight:700; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header id="cabecera"></header>
+  <h1>Torneo Interno Fo Lung Men 2026</h1>
+  <p class="sub" id="subtitulo">Cargando…</p>
+
+  <div id="cargando" class="cargando">Cargando formulario…</div>
+  <div id="cerrado" class="card oculto"><h2>Inscripciones cerradas</h2><p>El plazo de inscripción terminó. Para casos excepcionales contacta a la organización de tu escuela.</p></div>
+
+  <form id="form" class="oculto" novalidate>
+    <div class="trampa" aria-hidden="true"><label>No llenar <input type="text" id="sitio" tabindex="-1" autocomplete="off"></label></div>
+
+    <div class="card">
+      <h2>1. Datos del competidor</h2>
+      <label for="nombre">Nombre</label><input type="text" id="nombre" autocomplete="given-name" required>
+      <label for="apellido">Apellido</label><input type="text" id="apellido" autocomplete="family-name" required>
+      <label for="nacimiento">Fecha de nacimiento</label><input type="date" id="nacimiento" required>
+      <p class="hint" id="edadTxt"></p>
+      <label for="rut">RUT <span class="opt">(opcional)</span></label><input type="text" id="rut">
+      <label for="telefono">Teléfono de contacto</label><input type="tel" id="telefono" autocomplete="tel" required>
+      <label for="correo">Correo de contacto</label><input type="email" id="correo" autocomplete="email" required>
+    </div>
+
+    <div class="card">
+      <h2>2. Escuela</h2>
+      <label for="escuela">Escuela</label>
+      <select id="escuela" required><option value="">Elige tu escuela</option></select>
+      <p class="hint">Si tu escuela no aparece, contacta a la organización antes de inscribirte.</p>
+      <div id="bloqueFaja" class="oculto"><label for="faja">Grado (faja)</label><select id="faja"><option value="">Elige el grado</option></select></div>
+      <div id="bloquePractica" class="oculto"><label>Tiempo de práctica</label><div class="radios" id="practica"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>3. Modalidades</h2>
+      <p class="hint" id="modsHint">Ingresa primero la fecha de nacimiento para ver las modalidades que corresponden.</p>
+      <div id="modalidades"></div>
+      <div class="total"><span>Total a pagar</span><span id="total">$0</span></div>
+    </div>
+
+    <div class="card oculto" id="bloqueApoderado">
+      <h2>4. Apoderado</h2>
+      <p class="hint">Obligatorio porque el competidor es menor de 18 años.</p>
+      <label for="apoNombre">Nombre del apoderado</label><input type="text" id="apoNombre">
+      <label for="apoTel">Teléfono del apoderado</label><input type="tel" id="apoTel">
+      <label for="apoParentesco">Parentesco con el competidor</label><input type="text" id="apoParentesco">
+      <label class="check"><input type="checkbox" id="apoAutoriza"> Autorizo la participación del competidor en el torneo</label>
+    </div>
+
+    <div class="card">
+      <h2 id="tituloPago">5. Pago</h2>
+      <p>Transfiere el total a:</p>
+      <div class="banco" id="banco"></div>
+      <label for="montoPagado">Monto transferido (en pesos)</label>
+      <input type="number" id="montoPagado" inputmode="numeric" min="0" step="1" required>
+      <p class="hint">Si pagaste por varios competidores en una sola transferencia, escribe el monto total y sus nombres abajo.</p>
+      <label for="archivo">Comprobante <span class="opt">(imagen o PDF, máx. 10 MB)</span></label>
+      <input type="file" id="archivo" accept="image/*,application/pdf">
+      <label class="check" id="bloqueWhatsapp"><input type="checkbox" id="porWhatsapp"> No puedo subir el comprobante: lo enviaré por WhatsApp al <strong id="waNumero"></strong></label>
+      <label for="pagoIncluye">Este pago incluye también a… <span class="opt">(opcional)</span></label><textarea id="pagoIncluye" rows="2"></textarea>
+    </div>
+
+    <div class="card">
+      <h2 id="tituloCons">6. Consentimientos</h2>
+      <label>¿Autoriza el uso de fotos y videos del torneo?</label>
+      <div class="radios">
+        <label class="check"><input type="radio" name="usoImagen" value="Sí"> Sí</label>
+        <label class="check"><input type="radio" name="usoImagen" value="No"> No</label>
+      </div>
+      <label class="check"><input type="checkbox" id="reglamento"> Acepto el reglamento del torneo</label>
+    </div>
+
+    <div id="errores" class="errores oculto"></div>
+    <button type="submit" id="enviar">Enviar inscripción</button>
+    <p class="hint" style="text-align:center">Una inscripción por competidor. Para inscribir a otro, envía el formulario de nuevo.</p>
+  </form>
+
+  <div id="exito" class="card exito oculto">
+    <h2>¡Inscripción recibida!</h2>
+    <p>Tu número de inscripción es</p>
+    <div class="num" id="numero"></div>
+    <p id="resumen"></p>
+    <a id="waLink" class="wa oculto" target="_blank" rel="noopener">Enviar comprobante por WhatsApp</a>
+    <p class="aviso">Tu escuela revisará el pago y validará la inscripción. Guarda este número por si necesitas hacer consultas.</p>
+    <button type="button" id="otra">Inscribir a otro competidor</button>
+  </div>
+</div>
+
+<script>
+// Dirección de la API (Apps Script). Para otro torneo, cambiar solo esta línea (o usar -ApiUrl al generar).
+var API_URL = 'https://script.google.com/macros/s/AKfycbz0Hb_8ycEf14_SXjwSvC80OZZDVtILlK9pRXnsPnJy9x8QGSyQcJaNnaIQVIq4QYq71Q/exec';
+function apiGet(accion) {
+  return fetch(API_URL + '?accion=' + encodeURIComponent(accion), { method: 'GET', redirect: 'follow' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+function apiPost(accion, datos) {
+  return fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ accion: accion, datos: datos }) })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+var D = null;
+function $(id) { return document.getElementById(id); }
+function peso(n) { return '$' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+function edadAl(iso, refIso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return null;
+  var b = iso.split('-').map(Number), r = refIso.split('-').map(Number);
+  var e = r[0] - b[0];
+  if (r[1] < b[1] || (r[1] === b[1] && r[2] < b[2])) e--;
+  return e;
+}
+
+function init(d) {
+  D = d;
+  $('cargando').classList.add('oculto');
+  if (d.imagen) $('cabecera').innerHTML = '<img alt="Torneo Interno Fo Lung Men 2026" src="' + d.imagen + '">';
+  $('subtitulo').textContent = 'Fecha del torneo: ' + d.fechaTorneoTxt + ' · Inscripciones hasta el ' + d.cierreTxt + '.';
+  if (!d.abierto) { $('cerrado').classList.remove('oculto'); return; }
+  d.escuelas.forEach(function (e) { var o = document.createElement('option'); o.value = e.nombre; o.textContent = e.nombre; $('escuela').appendChild(o); });
+  renderFajas(null);
+  if (d.whatsapp) $('waNumero').textContent = d.whatsapp; else $('bloqueWhatsapp').classList.add('oculto');
+  $('practica').innerHTML = d.practica.map(function (p) { return '<label class="check"><input type="radio" name="practica" value="' + esc(p) + '"> ' + esc(p) + '</label>'; }).join('');
+  $('banco').textContent = d.datosTransferencia;
+  $('form').classList.remove('oculto');
+}
+
+// Fajas según edad: menores de 12 → Tiger y Junior; 12 o más → el resto.
+function esFajaInfantil(f) { return /^(tiger|junior)\b/i.test(String(f || '').trim()); }
+function renderFajas(edad) {
+  var sel = $('faja'), actual = sel.value, lim = D.edadFajaAdulto || 12;
+  sel.innerHTML = '';
+  var lista = (edad === null) ? [] : D.fajas.filter(function (f) { return edad < lim ? esFajaInfantil(f) : !esFajaInfantil(f); });
+  var o0 = document.createElement('option'); o0.value = '';
+  o0.textContent = edad === null ? 'Ingresa primero la fecha de nacimiento' : 'Elige el grado';
+  sel.appendChild(o0);
+  lista.forEach(function (f) { var o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
+  if (lista.indexOf(actual) >= 0) sel.value = actual;
+}
+
+function waUrl(numero, nombre) {
+  var n = String(D.whatsapp || '').replace(/\D/g, '');
+  return 'https://wa.me/' + n + '?text=' + encodeURIComponent('Hola, envío el comprobante de la inscripción ' + numero + ' de ' + nombre + ' (Torneo Interno Fo Lung Men 2026).');
+}
+
+function escuelaSel() { var n = $('escuela').value; return D.escuelas.filter(function (e) { return e.nombre === n; })[0] || null; }
+
+function onEscuela() {
+  var e = escuelaSel();
+  $('bloqueFaja').classList.toggle('oculto', !(e && e.usaFaja));
+  $('bloquePractica').classList.toggle('oculto', !(e && !e.usaFaja));
+}
+
+function onFecha() {
+  var edad = edadAl($('nacimiento').value, D.fechaTorneo);
+  var cont = $('modalidades'), marcadas = modsMarcadas();
+  if (edad === null || edad < 3 || edad > 99) {
+    $('edadTxt').textContent = $('nacimiento').value ? 'Revisa la fecha de nacimiento.' : '';
+    cont.innerHTML = ''; $('modsHint').classList.remove('oculto');
+  } else {
+    $('edadTxt').textContent = 'Edad el día del torneo: ' + edad + ' años.';
+    var ok = D.modalidades.filter(function (m) { return edad >= m.edadMin && edad <= m.edadMax; });
+    $('modsHint').classList.add('oculto');
+    cont.innerHTML = ok.length ? ok.map(function (m) {
+      return '<label class="check"><input type="checkbox" name="mod" value="' + esc(m.nombre) + '"' + (marcadas.indexOf(m.nombre) >= 0 ? ' checked' : '') + '> ' + esc(m.nombre) + '</label>';
+    }).join('') : '<p class="vacio">No hay modalidades para esta edad.</p>';
+  }
+  renderFajas(edad === null || edad < 3 || edad > 99 ? null : edad);
+  var menor = edad !== null && edad < 18;
+  $('bloqueApoderado').classList.toggle('oculto', !menor);
+  $('tituloPago').textContent = (menor ? '5' : '4') + '. Pago';
+  $('tituloCons').textContent = (menor ? '6' : '5') + '. Consentimientos';
+  onMods();
+}
+
+function modsMarcadas() { return [].slice.call(document.querySelectorAll('input[name=mod]:checked')).map(function (i) { return i.value; }); }
+
+function totalPara(mods) {
+  var n = mods.filter(function (x) { var m = D.modalidades.filter(function (y) { return y.nombre === x; })[0]; return !m || m.cuentaPrecio; }).length;
+  return n ? D.precios[Math.min(n, D.precios.length) - 1] : 0;
+}
+
+var montoTocado = false;
+function onMods() {
+  var t = totalPara(modsMarcadas());
+  $('total').textContent = peso(t);
+  if (!montoTocado) $('montoPagado').value = t || '';
+}
+
+function leerArchivo(f) {
+  return new Promise(function (ok, mal) {
+    if (!f) return ok(null);
+    var r = new FileReader();
+    r.onload = function () { ok({ nombre: f.name, tipo: f.type || 'application/octet-stream', tamano: f.size, datos: String(r.result).split(',')[1] }); };
+    r.onerror = function () { mal(new Error('No se pudo leer el archivo.')); };
+    r.readAsDataURL(f);
+  });
+}
+
+function mostrarErrores(lista) {
+  var e = $('errores');
+  e.innerHTML = '<strong>Revisa lo siguiente:</strong><ul>' + lista.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+  e.classList.remove('oculto'); e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function validarLocal(p, f) {
+  var e = [];
+  if (!p.nombre || !p.apellido) e.push('Escribe nombre y apellido.');
+  if (edadAl(p.nacimiento, D.fechaTorneo) === null) e.push('Ingresa la fecha de nacimiento.');
+  if (!p.telefono) e.push('Escribe un teléfono de contacto.');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.correo)) e.push('Escribe un correo válido.');
+  var es = escuelaSel();
+  if (!es) e.push('Elige la escuela.');
+  else if (es.usaFaja && !p.faja) e.push('Elige el grado (faja).');
+  else if (!es.usaFaja && !p.practica) e.push('Elige el tiempo de práctica.');
+  if (!p.modalidades.length) e.push('Elige al menos una modalidad.');
+  var edad = edadAl(p.nacimiento, D.fechaTorneo);
+  if (edad !== null && edad < 18 && !(p.apoNombre && p.apoTel && p.apoParentesco && p.apoAutoriza)) e.push('Completa los datos y la autorización del apoderado.');
+  if (!p.montoPagado) e.push('Escribe el monto transferido.');
+  if (!f && !p.porWhatsapp) e.push('Sube el comprobante o marca que lo enviarás por WhatsApp.');
+  if (f && f.size > 10 * 1024 * 1024) e.push('El comprobante supera 10 MB.');
+  if (!p.usoImagen) e.push('Responde sobre el uso de imagen.');
+  if (!p.reglamento) e.push('Acepta el reglamento.');
+  return e;
+}
+
+function onSubmit(ev) {
+  ev.preventDefault();
+  $('errores').classList.add('oculto');
+  var ui = document.querySelector('input[name=usoImagen]:checked'), pr = document.querySelector('input[name=practica]:checked');
+  var p = {
+    nombre: $('nombre').value.trim(), apellido: $('apellido').value.trim(), nacimiento: $('nacimiento').value,
+    rut: $('rut').value.trim(), telefono: $('telefono').value.trim(), correo: $('correo').value.trim(),
+    escuela: $('escuela').value, faja: $('faja').value, practica: pr ? pr.value : '',
+    modalidades: modsMarcadas(), apoNombre: $('apoNombre').value.trim(), apoTel: $('apoTel').value.trim(),
+    apoParentesco: $('apoParentesco').value.trim(), apoAutoriza: $('apoAutoriza').checked,
+    montoPagado: $('montoPagado').value, nOperacion: '', porWhatsapp: $('porWhatsapp').checked, pagoIncluye: $('pagoIncluye').value.trim(),
+    usoImagen: ui ? ui.value : '', reglamento: $('reglamento').checked, sitio: $('sitio').value
+  };
+  var f = $('archivo').files[0] || null;
+  var errs = validarLocal(p, f);
+  if (errs.length) return mostrarErrores(errs);
+  var b = $('enviar'); b.disabled = true; b.textContent = 'Enviando…';
+  leerArchivo(f).then(function (a) {
+    p.archivo = a;
+    apiPost('inscribir', p).then(function (r) {
+      b.disabled = false; b.textContent = 'Enviar inscripción';
+      if (!r.ok) return mostrarErrores(r.errores);
+      $('form').classList.add('oculto');
+      $('numero').textContent = r.numero;
+      $('resumen').textContent = p.nombre + ' ' + p.apellido + ' · ' + r.modalidades + (r.modalidades === 1 ? ' modalidad' : ' modalidades') + ' · ' + peso(r.total);
+      var wa = $('waLink');
+      if (p.porWhatsapp && !f && D.whatsapp) { wa.href = waUrl(r.numero, p.nombre + ' ' + p.apellido); wa.classList.remove('oculto'); }
+      else wa.classList.add('oculto');
+      $('exito').classList.remove('oculto'); window.scrollTo(0, 0);
+    }).catch(function (e) {
+      b.disabled = false; b.textContent = 'Enviar inscripción';
+      mostrarErrores(['No se pudo enviar (' + (e && e.message ? e.message : 'error de conexión') + '). Revisa tu conexión e intenta de nuevo.']);
+    });
+  }).catch(function (e) { b.disabled = false; b.textContent = 'Enviar inscripción'; mostrarErrores([e.message]); });
+}
+
+function arrancar() {
+  $('escuela').addEventListener('change', onEscuela);
+  $('nacimiento').addEventListener('change', onFecha);
+  $('modalidades').addEventListener('change', onMods);
+  $('montoPagado').addEventListener('input', function () { montoTocado = true; });
+  $('form').addEventListener('submit', onSubmit);
+  $('otra').addEventListener('click', function () {
+    $('form').reset(); montoTocado = false; onEscuela(); onFecha();
+    $('exito').classList.add('oculto'); $('form').classList.remove('oculto'); window.scrollTo(0, 0);
+  });
+  cargarDatos();
+}
+
+function cargarDatos() {
+  $('cargando').textContent = 'Cargando formulario…';
+  var lento = setTimeout(function () {
+    if (!D) $('cargando').innerHTML = 'Está tardando más de lo normal… <button type="button" id="reintentar">Reintentar</button>';
+    var r = $('reintentar'); if (r) r.addEventListener('click', cargarDatos);
+  }, 20000);
+  apiGet('datos').then(function (d) { clearTimeout(lento); if (d && d.error) throw new Error(d.error); init(d); }).catch(function (e) {
+    clearTimeout(lento);
+    $('cargando').innerHTML = 'No se pudo cargar el formulario. <button type="button" id="reintentar">Reintentar</button>';
+    $('reintentar').addEventListener('click', cargarDatos);
+  });
+}
+
+// Dentro del marco de Apps Script, DOMContentLoaded puede haber ocurrido ya: arrancar en ambos casos.
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arrancar); else arrancar();
+</script>
+</body>
+</html>
