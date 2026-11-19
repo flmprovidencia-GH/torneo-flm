@@ -98,6 +98,7 @@
       <label for="archivo">Comprobante <span class="opt">(imagen o PDF, máx. 10 MB)</span></label>
       <input type="file" id="archivo" accept="image/*,application/pdf">
       <label class="check" id="bloqueWhatsapp"><input type="checkbox" id="porWhatsapp"> No puedo subir el comprobante: lo enviaré por WhatsApp al <strong id="waNumero"></strong></label>
+      <p class="aviso oculto" id="waAviso">Completa el formulario y presiona <strong>Enviar inscripción</strong>. Al final aparecerá un botón verde para mandar el comprobante por WhatsApp con tu número de inscripción.</p>
       <label for="pagoIncluye">Este pago incluye también a… <span class="opt">(opcional)</span></label><textarea id="pagoIncluye" rows="2"></textarea>
     </div>
 
@@ -291,7 +292,7 @@ function onSubmit(ev) {
       $('numero').textContent = r.numero;
       $('resumen').textContent = p.nombre + ' ' + p.apellido + ' · ' + r.modalidades + (r.modalidades === 1 ? ' modalidad' : ' modalidades') + ' · ' + peso(r.total);
       var wa = $('waLink');
-      if (p.porWhatsapp && !f && D.whatsapp) { wa.href = waUrl(r.numero, p.nombre + ' ' + p.apellido); wa.classList.remove('oculto'); }
+      if (p.porWhatsapp && D.whatsapp) { wa.href = waUrl(r.numero, p.nombre + ' ' + p.apellido); wa.classList.remove('oculto'); }
       else wa.classList.add('oculto');
       $('exito').classList.remove('oculto'); window.scrollTo(0, 0);
     }).catch(function (e) {
@@ -307,8 +308,9 @@ function arrancar() {
   $('modalidades').addEventListener('change', onMods);
   $('montoPagado').addEventListener('input', function () { montoTocado = true; });
   $('form').addEventListener('submit', onSubmit);
+  $('porWhatsapp').addEventListener('change', function () { $('waAviso').classList.toggle('oculto', !this.checked); });
   $('otra').addEventListener('click', function () {
-    $('form').reset(); montoTocado = false; onEscuela(); onFecha();
+    $('form').reset(); montoTocado = false; onEscuela(); onFecha(); $('waAviso').classList.add('oculto');
     $('exito').classList.add('oculto'); $('form').classList.remove('oculto'); window.scrollTo(0, 0);
   });
   cargarDatos();
