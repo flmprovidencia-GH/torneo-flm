@@ -67,7 +67,9 @@
       <h2>2. Escuela</h2>
       <label for="escuela">Escuela</label>
       <select id="escuela" required><option value="">Elige tu escuela</option></select>
-      <p class="hint">Si tu escuela no aparece, contacta a la organización antes de inscribirte.</p>
+      <p class="hint">Si tu escuela no aparece, elige <strong>Otra escuela</strong> y escribe su nombre.</p>
+      <div id="bloqueOtra" class="oculto"><label for="escuelaOtra">Nombre de tu escuela</label><input type="text" id="escuelaOtra" maxlength="80" autocomplete="organization">
+        <p class="hint">Escríbelo completo. Si hay diferencias de escritura, la organización lo corrige en la planilla.</p></div>
       <div id="bloqueFaja" class="oculto"><label for="faja">Grado (faja)</label><select id="faja"><option value="">Elige el grado</option></select></div>
       <div id="bloquePractica" class="oculto"><label>Tiempo de práctica</label><div class="radios" id="practica"></div></div>
     </div>
@@ -75,6 +77,7 @@
     <div class="card">
       <h2>3. Modalidades</h2>
       <p class="hint" id="modsHint">Ingresa primero la fecha de nacimiento para ver las modalidades que corresponden.</p>
+      <p class="hint oculto" id="maxTxt"></p>
       <div id="modalidades"></div>
       <div class="total"><span>Total a pagar</span><span id="total">$0</span></div>
     </div>
@@ -110,6 +113,7 @@
         <label class="check"><input type="radio" name="usoImagen" value="No"> No</label>
       </div>
       <label class="check"><input type="checkbox" id="reglamento"> Acepto el reglamento del torneo</label>
+      <p class="hint oculto" id="reglamentoLink"><a target="_blank" rel="noopener">Leer el reglamento y bases del torneo</a></p>
     </div>
 
     <div id="errores" class="errores oculto"></div>
@@ -160,6 +164,9 @@ function init(d) {
   $('subtitulo').textContent = 'Fecha del torneo: ' + d.fechaTorneoTxt + ' · Inscripciones hasta el ' + d.cierreTxt + '.';
   if (!d.abierto) { $('cerrado').classList.remove('oculto'); return; }
   d.escuelas.forEach(function (e) { var o = document.createElement('option'); o.value = e.nombre; o.textContent = e.nombre; $('escuela').appendChild(o); });
+  var oo = document.createElement('option'); oo.value = OTRA(); oo.textContent = OTRA() + ' (escribe el nombre)'; $('escuela').appendChild(oo);
+  if (/^https:\/\//.test(d.reglamentoUrl || '')) { $('reglamentoLink').querySelector('a').href = d.reglamentoUrl; $('reglamentoLink').classList.remove('oculto'); }
+  if (d.maxModalidades) { $('maxTxt').textContent = 'Puedes elegir hasta ' + d.maxModalidades + ' modalidades.'; $('maxTxt').classList.remove('oculto'); }
   renderFajas(null);
   if (d.whatsapp) $('waNumero').textContent = d.whatsapp; else $('bloqueWhatsapp').classList.add('oculto');
   $('practica').innerHTML = d.practica.map(function (p) { return '<label class="check"><input type="radio" name="practica" value="' + esc(p) + '"> ' + esc(p) + '</label>'; }).join('');
@@ -185,10 +192,16 @@ function waUrl(numero, nombre) {
   return 'https://wa.me/' + n + '?text=' + encodeURIComponent('Hola, envío el comprobante de la inscripción ' + numero + ' de ' + nombre + ' (Torneo Interno Fo Lung Men 2026).');
 }
 
-function escuelaSel() { var n = $('escuela').value; return D.escuelas.filter(function (e) { return e.nombre === n; })[0] || null; }
+function OTRA() { return (D && D.escuelaOtra) || 'Otra escuela'; }
+function escuelaSel() {
+  var n = $('escuela').value;
+  if (n && n === OTRA()) return { nombre: n, usaFaja: false, otra: true };
+  return D.escuelas.filter(function (e) { return e.nombre === n; })[0] || null;
+}
 
 function onEscuela() {
   var e = escuelaSel();
+  $('bloqueOtra').classList.toggle('oculto', !(e && e.otra));
   $('bloqueFaja').classList.toggle('oculto', !(e && e.usaFaja));
   $('bloquePractica').classList.toggle('oculto', !(e && !e.usaFaja));
 }
@@ -224,7 +237,12 @@ function totalPara(mods) {
 
 var montoTocado = false;
 function onMods() {
-  var t = totalPara(modsMarcadas());
+  var marcadas = modsMarcadas(), max = D.maxModalidades || 0;
+  [].slice.call(document.querySelectorAll('input[name=mod]')).forEach(function (i) {
+    i.disabled = !!max && !i.checked && marcadas.length >= max;
+    i.parentNode.style.opacity = i.disabled ? '0.5' : '';
+  });
+  var t = totalPara(marcadas);
   $('total').textContent = peso(t);
   if (!montoTocado) $('montoPagado').value = t || '';
 }
@@ -253,9 +271,11 @@ function validarLocal(p, f) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.correo)) e.push('Escribe un correo válido.');
   var es = escuelaSel();
   if (!es) e.push('Elige la escuela.');
+  else if (es.otra && !p.escuelaOtra) e.push('Escribe el nombre de tu escuela.');
   else if (es.usaFaja && !p.faja) e.push('Elige el grado (faja).');
   else if (!es.usaFaja && !p.practica) e.push('Elige el tiempo de práctica.');
   if (!p.modalidades.length) e.push('Elige al menos una modalidad.');
+  if (D.maxModalidades && p.modalidades.length > D.maxModalidades) e.push('Puedes elegir hasta ' + D.maxModalidades + ' modalidades.');
   var edad = edadAl(p.nacimiento, D.fechaTorneo);
   if (edad !== null && edad < 18 && !(p.apoNombre && p.apoTel && p.apoParentesco && p.apoAutoriza)) e.push('Completa los datos y la autorización del apoderado.');
   if (!p.montoPagado) e.push('Escribe el monto transferido.');
@@ -273,7 +293,7 @@ function onSubmit(ev) {
   var p = {
     nombre: $('nombre').value.trim(), apellido: $('apellido').value.trim(), nacimiento: $('nacimiento').value,
     rut: $('rut').value.trim(), telefono: $('telefono').value.trim(), correo: $('correo').value.trim(),
-    escuela: $('escuela').value, faja: $('faja').value, practica: pr ? pr.value : '',
+    escuela: $('escuela').value, escuelaOtra: $('escuelaOtra').value.trim(), faja: $('faja').value, practica: pr ? pr.value : '',
     modalidades: modsMarcadas(), apoNombre: $('apoNombre').value.trim(), apoTel: $('apoTel').value.trim(),
     apoParentesco: $('apoParentesco').value.trim(), apoAutoriza: $('apoAutoriza').checked,
     montoPagado: $('montoPagado').value, nOperacion: '', porWhatsapp: $('porWhatsapp').checked, pagoIncluye: $('pagoIncluye').value.trim(),
