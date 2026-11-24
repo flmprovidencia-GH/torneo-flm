@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Jueces · Torneo Interno Fo Lung Men 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<style>
+  :root { --rojo:#b3121b; --rojo2:#8c0d14; --oro:#d4a017; --tinta:#1f1f1f; --gris:#6b6b6b; --borde:#e2dcd5; --fondo:#f6f2ee; --ok:#1e7a3b; --azul:#1d4f91; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--fondo); color:var(--tinta); font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:720px; margin:0 auto; padding:12px 16px 80px; }
+  .top { position:sticky; top:0; z-index:5; background:var(--rojo2); color:#fff; padding:10px 16px; display:flex; gap:8px; align-items:center; justify-content:space-between; }
+  .top b { font-size:1rem; } .top small { opacity:.85; display:block; font-size:.8rem; }
+  .top button { width:auto; margin:0; padding:8px 12px; font-size:.9rem; background:rgba(255,255,255,.15); }
+  .prueba { background:#fff3cd; color:#7a5b00; text-align:center; font-weight:700; padding:6px; font-size:.9rem; }
+  h1 { font-size:1.35rem; color:var(--rojo2); margin:12px 0 4px; }
+  h2 { font-size:1.1rem; margin:16px 0 8px; }
+  .card { background:#fff; border:1px solid var(--borde); border-radius:12px; padding:14px; margin:10px 0; }
+  .cat { display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer; }
+  .cat .n { font-weight:700; } .cat .s { color:var(--gris); font-size:.9rem; }
+  .pill { border-radius:999px; padding:3px 10px; font-size:.8rem; font-weight:700; white-space:nowrap; background:#eee; }
+  .pill.ok { background:#e3f3e8; color:var(--ok); } .pill.pend { background:#fff4d6; color:#7a5b00; }
+  input { width:100%; padding:14px; font-size:20px; border:1px solid var(--borde); border-radius:10px; }
+  input:focus { outline:2px solid var(--oro); }
+  button { width:100%; padding:14px; font-size:1.05rem; font-weight:700; color:#fff; background:var(--rojo); border:0; border-radius:10px; cursor:pointer; margin-top:8px; }
+  button.sec { background:#fff; color:var(--rojo2); border:1px solid var(--rojo); }
+  button:disabled { opacity:.6; cursor:wait; }
+  .actual { border:2px solid var(--oro); background:#fffaf0; }
+  .actual .quien { font-size:1.3rem; font-weight:800; margin:4px 0; }
+  .nota-row { display:flex; gap:8px; align-items:center; } .nota-row input { font-size:2rem; text-align:center; font-weight:800; }
+  .lista { width:100%; border-collapse:collapse; font-size:.95rem; }
+  .lista th, .lista td { border-bottom:1px solid var(--borde); padding:8px 6px; text-align:left; }
+  .lista th { color:var(--gris); font-weight:600; font-size:.85rem; }
+  .lista tr.sel { background:#fffaf0; } .lista tr { cursor:pointer; }
+  .lista td.num { text-align:center; white-space:nowrap; }
+  .mia { font-weight:800; color:var(--azul); }
+  .vs { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; text-align:center; }
+  .vs .nombre { font-weight:700; } .vs .esc { color:var(--gris); font-size:.8rem; }
+  .botones3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px; }
+  .botones3 button { margin:0; padding:12px 4px; font-size:.9rem; background:#fff; color:var(--tinta); border:1px solid var(--borde); }
+  .botones3 button.on { background:var(--rojo); color:#fff; border-color:var(--rojo); }
+  .msg { position:fixed; left:12px; right:12px; bottom:12px; padding:12px 14px; border-radius:10px; color:#fff; background:#333; font-weight:600; z-index:9; max-width:696px; margin:0 auto; }
+  .msg.ok { background:var(--ok); } .msg.err { background:var(--rojo); }
+  .cola { background:#fff4d6; border:1px solid var(--oro); border-radius:10px; padding:10px; margin:10px 0; font-weight:600; }
+  .oculto { display:none !important; }
+  .hint { color:var(--gris); font-size:.9rem; }
+  .podio1 { background:#fff6d6; } .podio2 { background:#f1f1f1; } .podio3 { background:#f7e7da; }
+  .inf h2 { border-left:4px solid var(--rojo); padding-left:8px; }
+  .aviso { background:#fdeceb; color:var(--rojo2); border-radius:8px; padding:8px; font-weight:600; margin:6px 0; }
+  @media print {
+    .top, .prueba, .noprint, .msg, .cola { display:none !important; }
+    body { background:#fff; font-size:12px; } .wrap { max-width:none; padding:0; }
+    .card { border:0; padding:0; margin:0 0 14px; page-break-inside:avoid; }
+    .lista th, .lista td { padding:4px; }
+    .inf .salto { page-break-after:always; }
+  }
+</style>
+</head>
+<body>
+<div class="top oculto" id="barra"><div><b id="yoNombre"></b><small id="yoDetalle"></small></div>
+  <div style="display:flex;gap:6px"><button id="btnInicio" type="button">Inicio</button><button id="btnSalir" type="button">Salir</button></div></div>
+<div class="prueba oculto" id="bandaPrueba">MODO PRUEBA · las notas van a las hojas de ensayo</div>
+<div class="wrap">
+  <div id="cola" class="cola oculto"></div>
+
+  <section id="vLogin">
+    <h1>Torneo Interno Fo Lung Men 2026</h1>
+    <p class="hint">App de jueces. Ingresa tu PIN personal.</p>
+    <div class="card">
+      <label for="pin"><b>PIN</b></label>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12">
+      <button id="btnEntrar" type="button">Entrar</button>
+    </div>
+  </section>
+
+  <section id="vInicio" class="oculto">
+    <h1>Mis categorías</h1>
+    <p class="hint" id="inicioHint"></p>
+    <div id="listaCats"></div>
+    <button id="btnInformeGeneral" class="sec oculto" type="button">Informe general de resultados</button>
+    <button id="btnRefrescar" class="sec" type="button">Actualizar</button>
+  </section>
+
+  <section id="vCat" class="oculto"></section>
+  <section id="vInforme" class="oculto inf"></section>
+</div>
+<div id="msg" class="msg oculto"></div>
+
+<script>
+// Dirección de la API (Apps Script). Misma que web/index.html.
+var API_URL = 'https://script.google.com/macros/s/AKfycbz0Hb_8ycEf14_SXjwSvC80OZZDVtILlK9pRXnsPnJy9x8QGSyQcJaNnaIQVIq4QYq71Q/exec';
+var S = { pin: '', yo: null, escala: { min: 1, max: 10 }, cats: [], cat: null, vista: 'login', sel: null, timer: null };
+var $ = function (id) { return document.getElementById(id); };
+function esc(s) { return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function guardar(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function leer(k, def) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
+var msgT;
+function aviso(t, tipo) { var m = $('msg'); m.textContent = t; m.className = 'msg ' + (tipo || ''); clearTimeout(msgT); msgT = setTimeout(function () { m.className = 'msg oculto'; }, tipo === 'err' ? 5000 : 2200); }
+
+// ---- API ----
+function api(datos) {
+  datos.pin = S.pin;
+  return fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ accion: 'jueces', datos: datos }) })
+    .then(function (r) { if (!r.ok) throw new Error('red'); return r.json(); })
+    .then(function (r) {
+      if (!r.ok && r.pinInvalido) { salir(); throw { app: 'PIN incorrecto.' }; }
+      if (!r.ok) throw { app: (r.errores || ['Error']).join(' ') };
+      if (r.juez) setYo(r.juez);
+      return r;
+    });
+}
+
+// ---- Cola sin conexión (notas y combates) ----
+function cola() { return leer('flm_cola_' + S.pin, []); }
+function setCola(c) { guardar('flm_cola_' + S.pin, c); pintarCola(); }
+function pintarCola() {
+  var c = S.pin ? cola() : [];
+  $('cola').className = c.length ? 'cola' : 'cola oculto';
+  $('cola').textContent = c.length ? ('Sin conexión: ' + c.length + ' registro(s) pendiente(s). Se enviarán automáticamente.') : '';
+}
+var enviando = false;
+function vaciarCola() {
+  var c = cola(); if (!c.length || enviando) return;
+  enviando = true;
+  api(c[0]).then(function (r) {
+    setCola(cola().slice(1)); enviando = false;
+    if (S.cat && r.categoria && r.categoria.clave === S.cat.clave) { S.cat = r.categoria; pintarCat(); }
+    vaciarCola();
+  }).catch(function (e) {
+    enviando = false;
+    if (e && e.app) { aviso('No se pudo guardar un registro pendiente: ' + e.app, 'err'); setCola(cola().slice(1)); }
+  });
+}
+setInterval(vaciarCola, 10000);
+window.addEventListener('online', vaciarCola);
+
+function enviar(datos, okTxt) {
+  return api(datos).then(function (r) { aviso(okTxt, 'ok'); return r; }).catch(function (e) {
+    if (e && e.app) { aviso(e.app, 'err'); throw e; }
+    var c = cola(); c.push(datos); setCola(c);
+    aviso('Sin conexión: quedó guardado en el celular y se enviará solo.', 'err');
+    return null;
+  });
+}
+
+// ---- Vistas ----
+function mostrar(v) {
+  S.vista = v;
+  ['vLogin', 'vInicio', 'vCat', 'vInforme'].forEach(function (id) { $(id).classList.toggle('oculto', id !== v); });
+  $('barra').classList.toggle('oculto', v === 'vLogin');
+  window.scrollTo(0, 0);
+}
+function setYo(j) {
+  S.yo = j;
+  $('yoNombre').textContent = j.nombre;
+  var rol = j.rol === 'jefe' ? 'Jefe de jueces' : j.rol === 'organizador' ? 'Organizador' : 'Juez';
+  $('yoDetalle').textContent = rol + (j.arena ? ' · Arena ' + j.arena : '') + (j.num ? ' · Juez ' + j.num : '');
+  $('bandaPrueba').classList.toggle('oculto', !j.prueba);
+}
+
+function entrar() {
+  var pin = $('pin').value.trim(); if (!pin) return;
+  S.pin = pin; $('btnEntrar').disabled = true;
+  cargarInicio().then(function () { guardar('flm_pin', pin); }).catch(function (e) {
+    aviso(e && e.app ? e.app : 'No hay conexión. Intenta de nuevo.', 'err'); S.pin = '';
+  }).then(function () { $('btnEntrar').disabled = false; });
+}
+function salir() { guardar('flm_pin', null); S.pin = ''; S.yo = null; $('pin').value = ''; clearInterval(S.timer); mostrar('vLogin'); }
+
+function cargarInicio() {
+  return api({ op: 'entrar' }).then(function (r) {
+    S.escala = r.escala; S.cats = r.categorias; pintarInicio(); mostrar('vInicio'); pintarCola(); vaciarCola(); auto();
+  });
+}
+function pintarInicio() {
+  var y = S.yo;
+  $('btnInformeGeneral').classList.toggle('oculto', y.rol === 'juez');
+  $('inicioHint').textContent = S.cats.length ? (y.rol === 'organizador' ? 'Todas las arenas.' : 'Arena ' + y.arena + '. Toca una categoría.')
+    : 'Aún no hay categorías generadas para tu arena. La organización debe usar "Generar planillas de puntajes y combates".';
+  $('listaCats').innerHTML = S.cats.map(function (c, i) {
+    var r = c.resumen, txt, ok = r.completa;
+    if (c.tipo === 'forma') txt = (y.num && y.rol !== 'organizador') ? ('Tus notas: ' + r.mias + '/' + r.total) : (r.total + ' competidores');
+    else txt = 'Combates: ' + r.hechos + '/' + r.total;
+    return '<div class="card cat" data-i="' + i + '"><div><div class="n">' + esc(c.nombre) + '</div><div class="s">' +
+      (c.tipo === 'forma' ? 'Forma' : 'Combate') + (y.rol === 'organizador' ? ' · Arena ' + c.arena : '') + ' · ' + esc(txt) + '</div></div>' +
+      '<span class="pill ' + (ok ? 'ok' : 'pend') + '">' + (ok ? 'Completa' : 'En curso') + '</span></div>';
+  }).join('');
+}
+$('listaCats').addEventListener('click', function (ev) {
+  var el = ev.target.closest('.cat'); if (!el) return;
+  abrirCat(S.cats[Number(el.getAttribute('data-i'))].clave);
+});
+
+function abrirCat(clave) {
+  $('vCat').innerHTML = '<p class="hint">Cargando…</p>'; mostrar('vCat'); S.sel = null;
+  api({ op: 'categoria', clave: clave }).then(function (r) { S.cat = r.categoria; pintarCat(); })
+    .catch(function (e) { aviso(e && e.app ? e.app : 'Sin conexión.', 'err'); mostrar('vInicio'); });
+}
+function refrescarCat() {
+  if (!S.cat) return;
+  api({ op: 'categoria', clave: S.cat.clave }).then(function (r) { S.cat = r.categoria; pintarCat(true); }).catch(function () {});
+}
+
+function pintarCat(silencioso) {
+  var c = S.cat, y = S.yo, h = '';
+  h += '<h1>' + esc(c.nombre) + '</h1><p class="hint">Arena ' + c.arena + ' · ' + (c.tipo === 'forma' ? 'Forma' : 'Combate') + '</p>';
+  if (c.tipo === 'forma') h += htmlForma(c, y); else h += htmlCombate(c, y);
+  if (y.rol !== 'juez') h += '<button class="sec noprint" type="button" data-acc="informe">Informe de esta categoría</button>';
+  h += '<button class="sec noprint" type="button" data-acc="volver">Volver a mis categorías</button>';
+  var activo = document.activeElement && document.activeElement.id === 'notaIn';
+  if (silencioso && activo) { // no interrumpir mientras escribe: solo se actualiza la tabla
+    var tmp = document.createElement('div'); tmp.innerHTML = h;
+    var nueva = tmp.querySelector('#tablaForma'), vieja = $('tablaForma');
+    if (nueva && vieja) vieja.innerHTML = nueva.innerHTML;
+    return;
+  }
+  var g0 = document.querySelector('[data-acc=guardar]'), prev = g0 && $('notaIn') ? { id: g0.getAttribute('data-id'), val: $('notaIn').value } : null;
+  $('vCat').innerHTML = h;
+  var inp = $('notaIn'), g1 = document.querySelector('[data-acc=guardar]');
+  if (inp && prev && g1 && g1.getAttribute('data-id') === prev.id && silencioso) inp.value = prev.val; // conserva lo escrito con los botones
+  if (inp && !silencioso) inp.focus();
+}
+
+function htmlForma(c, y) {
+  var h = '', puedo = y.rol !== 'organizador' && y.num;
+  var pend = c.competidores.filter(function (x) { return x.miNota === ''; });
+  var actual = S.sel ? c.competidores.filter(function (x) { return x.id === S.sel; })[0] : pend[0];
+  if (puedo) {
+    if (actual) {
+      h += '<div class="card actual"><div class="hint">' + (S.sel ? 'Editando' : 'Ahora compite') + ' · N° ' + actual.orden + '</div>' +
+        '<div class="quien">' + esc(actual.nombre) + '</div><div class="hint">' + esc(actual.escuela) + '</div>' +
+        '<div class="nota-row" style="margin-top:10px"><input id="notaIn" inputmode="numeric" autocomplete="off" placeholder="0,00" value="' + esc(fmtNota(actual.miNota)) + '"></div>' +
+        '<p class="hint" style="text-align:center">Nota con 2 decimales: escribe solo los números (875 = 8,75 · 1000 = 10,00)</p>' +
+        '<button type="button" data-acc="guardar" data-id="' + esc(actual.id) + '">Guardar nota</button>' +
+        (S.sel ? '<button class="sec" type="button" data-acc="cancelar">Cancelar edición</button>' : '') + '</div>';
+    } else h += '<div class="card"><b>Calificaste a todos los competidores.</b><p class="hint">Toca un nombre para corregir una nota.</p></div>';
+  }
+  var veTodo = y.rol !== 'juez';
+  h += '<div class="card" id="tablaForma"><table class="lista"><tr><th>N°</th><th>Competidor</th>' +
+    (veTodo ? [1, 2, 3, 4, 5].slice(0, Math.max(c.esperadas, 3)).map(function (k) { return '<th class="num">J' + k + '</th>'; }).join('') + '<th class="num">Final</th><th class="num">Puesto</th>'
+      : '<th class="num">Tu nota</th><th class="num">Jueces</th>') + '</tr>';
+  c.competidores.forEach(function (x) {
+    h += '<tr data-sel="' + esc(x.id) + '" class="' + (actual && actual.id === x.id ? 'sel' : '') + '"><td>' + x.orden + '</td><td>' + esc(x.nombre) + '<div class="hint">' + esc(x.escuela) + '</div></td>';
+    if (veTodo) {
+      h += x.notas.slice(0, Math.max(c.esperadas, 3)).map(function (n, k) { return '<td class="num' + (y.num === k + 1 ? ' mia' : '') + '">' + esc(fmtNota(n)) + '</td>'; }).join('');
+      h += '<td class="num"><b>' + fmtNota(x.final) + '</b></td><td class="num">' + (x.puesto || '') + (x.empate ? ' <span title="Empate">⚠</span>' : '') + '</td>';
+    } else h += '<td class="num mia">' + esc(fmtNota(x.miNota)) + '</td><td class="num">' + x.cuenta + '/' + c.esperadas + '</td>';
+    h += '</tr>';
+  });
+  h += '</table>';
+  if (veTodo && c.competidores.some(function (x) { return x.empate; })) h += '<div class="aviso">⚠ Hay empate en puesto: lo resuelve el jefe de jueces.</div>';
+  if (veTodo && c.competidores.some(function (x) { return x.errores; })) h += '<div class="aviso">Hay notas inválidas en la planilla.</div>';
+  h += '<p class="hint">Avance: ' + c.resumen.total + ' competidores · ' + (c.resumen.completa ? 'categoría completa ✓' : 'en curso') + '</p></div>';
+  return h;
+}
+
+function htmlCombate(c, y) {
+  var h = '', jefe = y.rol === 'jefe';
+  if (!jefe) h += '<p class="hint">Los resultados de combates los registra el jefe de jueces.</p>';
+  var porGrupo = {};
+  c.combates.forEach(function (m) { (porGrupo[m.grupo] = porGrupo[m.grupo] || []).push(m); });
+  Object.keys(porGrupo).forEach(function (g) {
+    h += '<h2>' + esc(g === 'Único' ? 'Combates' : g) + '</h2>';
+    porGrupo[g].forEach(function (m) {
+      var key = esc(JSON.stringify({ g: m.grupo, a: m.a, b: m.b }));
+      h += '<div class="card"><div class="hint">Combate ' + m.n + '</div><div class="vs"><div><div class="nombre">' + esc(m.nombreA) + '</div><div class="esc">' + esc(m.escuelaA) + '</div></div><b>vs</b>' +
+        '<div><div class="nombre">' + esc(m.nombreB) + '</div><div class="esc">' + esc(m.escuelaB) + '</div></div></div>';
+      if (jefe) h += '<div class="botones3">' + ['Gana A', 'Empate', 'Gana B'].map(function (r) {
+        var lab = r === 'Gana A' ? 'Gana ' + m.nombreA.split(' ')[0] : r === 'Gana B' ? 'Gana ' + m.nombreB.split(' ')[0] : 'Empate';
+        return '<button type="button" class="' + (m.resultado === r ? 'on' : '') + '" data-comb="' + key + '" data-res="' + r + '">' + esc(lab) + '</button>';
+      }).join('') + '</div>';
+      else h += '<p style="text-align:center;font-weight:700">' + esc(m.resultado || 'Pendiente') + '</p>';
+      h += '</div>';
+    });
+  });
+  h += '<h2>Tabla de puntos</h2>';
+  c.tablas.forEach(function (t) {
+    h += '<div class="card"><b>' + esc(t.grupo === 'Único' ? 'Categoría' : t.grupo) + '</b>' + (t.completo ? ' ✓' : '') +
+      '<table class="lista"><tr><th>Puesto</th><th>Competidor</th><th class="num">Pts</th><th class="num">G</th><th class="num">PJ</th></tr>' +
+      t.tabla.map(function (x) { return '<tr><td>' + x.puesto + (x.empate ? ' ⚠' : '') + '</td><td>' + esc(x.nombre) + '</td><td class="num"><b>' + x.pts + '</b></td><td class="num">' + x.victorias + '</td><td class="num">' + x.jugados + '</td></tr>'; }).join('') +
+      '</table></div>';
+  });
+  if (c.empateCorte) h += '<div class="aviso">⚠ Empate en el corte de los grupos: el jefe de jueces define los finalistas y la organización arma la final en la planilla.</div>';
+  else if (c.tablas.length > 1 && !c.tablas.some(function (t) { return t.grupo === 'Final'; })) h += '<p class="hint">Al completar todos los grupos se crea la final automáticamente.</p>';
+  return h;
+}
+
+$('vCat').addEventListener('click', function (ev) {
+  var t = ev.target;
+  var acc = t.getAttribute('data-acc');
+  if (acc === 'volver') { S.cat = null; cargarInicio().catch(function () { mostrar('vInicio'); }); return; }
+  if (acc === 'cancelar') { S.sel = null; pintarCat(); return; }
+  if (acc === 'informe') { abrirInforme(S.cat.clave); return; }
+  if (acc === 'guardar') { guardarNota(t.getAttribute('data-id')); return; }
+  var tr = t.closest('tr[data-sel]');
+  if (tr && S.yo.rol !== 'organizador' && S.yo.num) { S.sel = tr.getAttribute('data-sel'); pintarCat(); return; }
+  if (t.getAttribute('data-comb')) {
+    var k = JSON.parse(t.getAttribute('data-comb')), res = t.getAttribute('data-res');
+    var m = S.cat.combates.filter(function (x) { return x.grupo === k.g && x.a === k.a && x.b === k.b; })[0];
+    if (m.resultado === res) res = ''; // tocar de nuevo = borrar
+    m.resultado = res; pintarCat();
+    enviar({ op: 'combate', clave: S.cat.clave, grupo: k.g, a: k.a, b: k.b, resultado: res }, res ? 'Resultado guardado' : 'Resultado borrado')
+      .then(function (r) { if (r && r.categoria) { S.cat = r.categoria; pintarCat(); } }).catch(function () { refrescarCat(); });
+  }
+});
+$('vCat').addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target.id === 'notaIn') { var b = document.querySelector('[data-acc=guardar]'); if (b) b.click(); } });
+// El juez escribe solo dígitos; la coma se pone sola antes de los 2 últimos (875 → 8,75).
+$('vCat').addEventListener('input', function (ev) { if (ev.target.id === 'notaIn') ev.target.value = fmtDigitos(ev.target.value); });
+function fmtDigitos(s) {
+  var d = String(s || '').replace(/\D/g, '').replace(/^0+(?=\d{3})/, '').slice(0, 4);
+  return d.length >= 3 ? d.slice(0, -2) + ',' + d.slice(-2) : d;
+}
+function fmtNota(n) {
+  if (n === '' || n === null || n === undefined) return '';
+  var x = Number(String(n).replace(',', '.'));
+  return isNaN(x) ? String(n) : x.toFixed(2).replace('.', ',');
+}
+
+function guardarNota(id) {
+  var txt = $('notaIn').value.trim(), v = '';
+  if (txt === '' && !S.sel) { aviso('Escribe la nota antes de guardar.', 'err'); return; } // borrar solo al editar
+  if (txt !== '') {
+    if (!/^\d{1,2},\d{2}$/.test(txt)) { aviso('La nota debe tener 2 decimales: escribe 3 o 4 números (875 = 8,75).', 'err'); return; }
+    v = txt.replace(',', '.');
+    var n = Number(v);
+    if (n < S.escala.min || n > S.escala.max) { aviso('La nota debe estar entre ' + fmtNota(S.escala.min) + ' y ' + fmtNota(S.escala.max) + '.', 'err'); return; }
+  }
+  var x = S.cat.competidores.filter(function (c) { return c.id === id; })[0];
+  x.miNota = v; S.sel = null; pintarCat(); // avanza al siguiente sin esperar
+  enviar({ op: 'nota', clave: S.cat.clave, id: id, nota: v }, (v ? 'Nota ' + fmtNota(v) + ' guardada' : 'Nota borrada') + ' · ' + x.nombre)
+    .then(function (r) { if (r && r.categoria && S.cat && r.categoria.clave === S.cat.clave) { S.cat = r.categoria; pintarCat(true); } })
+    .catch(function () { refrescarCat(); });
+}
+
+// ---- Informe ----
+function abrirInforme(clave) {
+  $('vInforme').innerHTML = '<p class="hint">Generando informe…</p>'; mostrar('vInforme');
+  api({ op: 'informe', clave: clave }).then(function (r) { pintarInforme(r.informe, clave); })
+    .catch(function (e) { aviso(e && e.app ? e.app : 'Sin conexión.', 'err'); mostrar('vInicio'); });
+}
+function pintarInforme(inf, clave) {
+  var h = '<div class="noprint"><button type="button" data-acc="imprimir">Imprimir / Guardar PDF</button><button class="sec" type="button" data-acc="volverInf">Volver</button></div>';
+  h += '<div class="card"><h1>Torneo Interno Fo Lung Men 2026</h1><p class="hint">Resultados ' + (clave === '*' ? 'generales' : 'de categoría') + ' · generado ' + esc(inf.generado) + (S.yo.prueba ? ' · PRUEBA' : '') + '</p></div>';
+  var med = ['', '🥇 Oro', '🥈 Plata', '🥉 Bronce'];
+  inf.categorias.forEach(function (c) {
+    h += '<div class="card"><h2>' + esc(c.nombre) + '</h2><p class="hint">Arena ' + c.arena + ' · ' + (c.tipo === 'forma' ? 'Forma' : 'Combate') + '</p>';
+    if (!c.completa) h += '<div class="aviso">Categoría incompleta: los puestos pueden cambiar.</div>';
+    if (c.filas.some(function (f) { return f.empate; })) h += '<div class="aviso">Hay empate: debe resolverlo el jefe de jueces.</div>';
+    if (c.tipo === 'forma') {
+      h += '<table class="lista"><tr><th>Puesto</th><th>Competidor</th><th>Escuela</th><th class="num">Notas</th><th class="num">Final</th></tr>';
+      c.filas.forEach(function (f) {
+        h += '<tr class="' + (f.puesto && f.puesto <= 3 && c.completa ? 'podio' + f.puesto : '') + '"><td>' + (f.puesto ? f.puesto + '°' : '–') + (f.puesto <= 3 && c.completa ? ' ' + med[f.puesto] : '') + '</td><td><b>' + esc(f.nombre) + '</b></td><td>' + esc(f.escuela) +
+          '</td><td class="num">' + esc(f.notas.filter(String).map(fmtNota).join(' · ')) + '</td><td class="num"><b>' + fmtNota(f.final) + '</b></td></tr>';
+      });
+      h += '</table>';
+    } else {
+      if (c.filas.length) {
+        h += '<table class="lista"><tr><th>Puesto</th><th>Competidor</th><th>Escuela</th><th class="num">Pts</th></tr>';
+        c.filas.forEach(function (f) { h += '<tr class="' + (f.puesto <= 3 ? 'podio' + f.puesto : '') + '"><td>' + f.puesto + '°' + (f.puesto <= 3 ? ' ' + med[f.puesto] : '') + '</td><td><b>' + esc(f.nombre) + '</b></td><td>' + esc(f.escuela) + '</td><td class="num">' + f.pts + '</td></tr>'; });
+        h += '</table>';
+      }
+      c.tablas.filter(function (t) { return c.tablas.length > 1; }).forEach(function (t) {
+        h += '<p class="hint" style="margin-top:8px"><b>' + esc(t.grupo) + ':</b> ' + t.tabla.map(function (x) { return x.puesto + '° ' + esc(x.nombre) + ' (' + x.pts + ')'; }).join(' · ') + '</p>';
+      });
+    }
+    h += '</div>';
+  });
+  if (inf.medallero) {
+    h += '<div class="card"><h2>Medallero por escuela</h2><table class="lista"><tr><th>Escuela</th><th class="num">Oro</th><th class="num">Plata</th><th class="num">Bronce</th><th class="num">Total</th></tr>' +
+      inf.medallero.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td class="num">' + r[1] + '</td><td class="num">' + r[2] + '</td><td class="num">' + r[3] + '</td><td class="num"><b>' + r[4] + '</b></td></tr>'; }).join('') +
+      '</table><p class="hint">Solo cuenta categorías completas.</p></div>';
+  }
+  $('vInforme').innerHTML = h;
+  S.infClave = clave;
+}
+$('vInforme').addEventListener('click', function (ev) {
+  var a = ev.target.getAttribute('data-acc');
+  if (a === 'imprimir') window.print();
+  if (a === 'volverInf') { if (S.infClave !== '*' && S.cat) { mostrar('vCat'); refrescarCat(); } else cargarInicio().catch(function () { mostrar('vInicio'); }); }
+});
+
+// ---- Refresco automático (ve el avance de los demás jueces) ----
+function auto() {
+  clearInterval(S.timer);
+  S.timer = setInterval(function () {
+    if (document.hidden || !S.pin) return;
+    if (S.vista === 'vCat' && S.yo && S.yo.rol !== 'juez') refrescarCat();
+    if (S.vista === 'vInicio') api({ op: 'entrar' }).then(function (r) { S.cats = r.categorias; pintarInicio(); }).catch(function () {});
+  }, 20000);
+}
+
+$('btnEntrar').onclick = entrar;
+$('pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') entrar(); });
+$('btnSalir').onclick = function () { if (cola().length && !confirm('Hay registros sin enviar. ¿Salir igual?')) return; salir(); };
+$('btnInicio').onclick = function () { S.cat = null; cargarInicio().catch(function () { mostrar('vInicio'); }); };
+$('btnRefrescar').onclick = function () { cargarInicio().catch(function (e) { aviso(e && e.app ? e.app : 'Sin conexión.', 'err'); }); };
+$('btnInformeGeneral').onclick = function () { abrirInforme('*'); };
+
+(function inicio() {
+  var p = leer('flm_pin', '');
+  if (p) { S.pin = p; $('pin').value = p; cargarInicio().catch(function () { mostrar('vLogin'); pintarCola(); }); }
+})();
+</script>
+</body>
+</html>
